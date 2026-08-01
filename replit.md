@@ -1,24 +1,21 @@
-# [Project name]
+# Data Processor
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A command-line data processing tool written in plain Python — no web server, no framework.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `python -m src.main <input_file>` — process a file and print results to stdout
+- `python -m src.main <input_file> -o <output_file>` — write results to a file
+- `python -m src.main -v` — enable verbose mode
+- `python -m pytest` — run the test suite
+- `pip install -r requirements.txt` — install dependencies
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Python 3.11+
+- No web framework — pure CLI tool
+- `pyproject.toml` for project metadata and tool config
+- `pytest` for testing
 
 ## Where things live
 
