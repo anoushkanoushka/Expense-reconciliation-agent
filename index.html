@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reconcile — AI Expense Reconciliation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --green: #c9ef4e;
+        --green-deep: #a9d92a;
+        --blue: #3a4fdb;
+        --blue-dark: #2c3cae;
+        --cream: #f2ede2;
+        --black: #24261f;
+        --white: #ffffff;
+        --purple: #7c5cff;
+        --red: #e2493d;
+        --radius-lg: 28px;
+        --radius-md: 18px;
+        --radius-sm: 12px;
+        --shadow: 0 8px 0 rgba(36, 38, 31, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--green);
+        color: var(--black);
+        font-family: "Montserrat", sans-serif;
+        line-height: 1.5;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* decorative background texture, like the swirl in the reference */
+      body::before {
+        content: "";
+        position: fixed;
+        top: -20%;
+        right: -15%;
+        width: 70vw;
+        height: 70vw;
+        max-width: 900px;
+        max-height: 900px;
+        border-radius: 50%;
+        border: 70px solid rgba(255, 255, 255, 0.1);
+        z-index: 0;
+        pointer-events: none;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        bottom: -25%;
+        left: -20%;
+        width: 60vw;
+        height: 60vw;
+        max-width: 800px;
+        max-height: 800px;
+        border-radius: 50%;
+        border: 60px solid rgba(36, 38, 31, 0.06);
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      h1,
+      h2,
+      h3,
+      .display {
+        font-family: "Baloo 2", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .wrap {
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 0 24px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ---------- STAR / STICKER ---------- */
+      .star {
+        position: absolute;
+        display: block;
+        filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.08));
+      }
+      .star svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* ---------- HERO ---------- */
+      .hero {
+        padding: 64px 0 40px;
+      }
+      .hero-inner {
+        background: var(--cream);
+        border-radius: var(--radius-lg);
+        padding: 56px 48px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--black);
+        color: var(--green);
+        font-family: "Baloo 2", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        padding: 8px 18px;
+        border-radius: 999px;
+        margin-bottom: 28px;
+      }
+      .eyebrow .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+      .hero h1 {
+        font-size: clamp(42px, 7vw, 84px);
+        color: var(--blue);
+        font-weight: 800;
+        line-height: 0.95;
+        margin-bottom: 28px;
+      }
+      .tagline-pill {
+        display: inline-block;
+        background: var(--blue);
+        color: var(--white);
+        font-family: "Baloo 2", sans-serif;
+        font-weight: 700;
+        font-size: clamp(16px, 2.4vw, 24px);
+        padding: 14px 28px;
+        border-radius: 999px;
+        max-width: 100%;
+        line-height: 1.3;
+        margin-bottom: 26px;
+        box-shadow: 0 5px 0 var(--blue-dark);
+      }
+      .hero p.lead {
+        max-width: 640px;
+        font-size: 16.5px;
+        color: #4a4c40;
+        font-weight: 500;
+      }
+      .hero-star {
+        top: 36px;
+        right: 48px;
+        width: 70px;
+        height: 70px;
+        color: var(--green);
+      }
+
+      /* ---------- SECTION HEADERS (blue/green pill combo) ---------- */
+      .section-title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 32px;
+      }
+      .pill {
+        font-family: "Baloo 2", sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 12px 26px;
+        border-radius: 999px;
+        font-size: clamp(20px, 3vw, 32px);
+        display: inline-block;
+      }
+      .pill.blue {
+        background: var(--blue);
+        color: var(--white);
+        box-shadow: 0 5px 0 var(--blue-dark);
+      }
+      .pill.dark {
+        background: var(--black);
+        color: var(--green);
+      }
+
+      section {
+        padding: 36px 0;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ---------- STATS ---------- */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+      .stat-card {
+        border-radius: var(--radius-md);
+        padding: 28px 22px;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+      }
+      .stat-card .num {
+        font-family: "Baloo 2", sans-serif;
+        font-size: clamp(32px, 4vw, 46px);
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+      .stat-card .label {
+        font-weight: 600;
+        font-size: 13.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        opacity: 0.85;
+      }
+      .stat-card.c-blue {
+        background: var(--blue);
+        color: var(--white);
+      }
+      .stat-card.c-cream {
+        background: var(--cream);
+        color: var(--black);
+      }
+      .stat-card.c-dark {
+        background: var(--black);
+        color: var(--green);
+      }
+      .stat-card.c-green {
+        background: var(--white);
+        color: var(--blue);
+        border: 3px solid var(--blue);
+      }
+
+      /* ---------- HOW IT WORKS ---------- */
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+      .step-card {
+        background: var(--white);
+        border-radius: var(--radius-md);
+        padding: 26px 22px 24px;
+        box-shadow: var(--shadow);
+        position: relative;
+      }
+      .step-num {
+        font-family: "Baloo 2", sans-serif;
+        font-weight: 800;
+        font-size: 14px;
+        color: var(--white);
+        background: var(--blue);
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+      }
+      .step-card h3 {
+        font-size: 16px;
+        color: var(--black);
+        margin-bottom: 10px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
+      .step-card p {
+        font-size: 14px;
+        color: #5c5e50;
+        font-weight: 500;
+      }
+
+      /* ---------- RESULTS ---------- */
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+      .filter-btn {
+        font-family: "Baloo 2", sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: var(--white);
+        color: var(--black);
+        border: none;
+        padding: 12px 22px;
+        border-radius: 999px;
+        cursor: pointer;
+        box-shadow: 0 4px 0 rgba(36, 38, 31, 0.15);
+        transition:
+          transform 0.12s ease,
+          background 0.12s ease,
+          color 0.12s ease;
+      }
+      .filter-btn:hover {
+        transform: translateY(-2px);
+      }
+      .filter-btn.active {
+        background: var(--black);
+        color: var(--green);
+      }
+      .filter-btn .count {
+        opacity: 0.6;
+        font-size: 12px;
+        margin-left: 4px;
+      }
+
+      .results-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+      }
+      .result-card {
+        background: var(--white);
+        border-radius: var(--radius-md);
+        padding: 22px 24px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .result-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .result-desc {
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--black);
+        line-height: 1.3;
+      }
+      .result-meta {
+        font-size: 13px;
+        color: #7b7d6e;
+        font-weight: 600;
+        margin-top: 4px;
+      }
+      .result-amount {
+        font-family: "Baloo 2", sans-serif;
+        font-weight: 800;
+        font-size: 20px;
+        color: var(--blue);
+        white-space: nowrap;
+      }
+      .badge {
+        display: inline-flex;
+        align-self: flex-start;
+        align-items: center;
+        gap: 6px;
+        font-family: "Baloo 2", sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        color: var(--white);
+      }
+      .badge.matched {
+        background: #4caf3d;
+      }
+      .badge.needs_clarification {
+        background: var(--purple);
+      }
+      .badge.no_match {
+        background: var(--red);
+      }
+      .badge .confidence {
+        opacity: 0.8;
+        font-weight: 600;
+        text-transform: lowercase;
+      }
+
+      .clarify-box {
+        background: #f2eeff;
+        border: 2px dashed var(--purple);
+        border-radius: var(--radius-sm);
+        padding: 12px 14px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #4d3aa0;
+      }
+      .clarify-box strong {
+        display: block;
+        font-family: "Baloo 2", sans-serif;
+        font-size: 11.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--purple);
+        margin-bottom: 4px;
+      }
+
+      .reasoning {
+        font-size: 13px;
+        color: #8b8d7d;
+        font-weight: 500;
+        line-height: 1.5;
+      }
+
+      .receipt-line {
+        font-size: 12.5px;
+        color: #a7a996;
+        font-weight: 600;
+      }
+
+      .empty-state {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 40px;
+        color: #5c5e50;
+        font-weight: 600;
+      }
+
+      /* ---------- FOOTER ---------- */
+      footer {
+        margin-top: 40px;
+        padding: 36px 0 56px;
+        text-align: center;
+      }
+      footer .footer-pill {
+        display: inline-block;
+        background: var(--black);
+        color: var(--cream);
+        font-size: 14px;
+        font-weight: 600;
+        padding: 14px 28px;
+        border-radius: 999px;
+      }
+      footer a {
+        color: var(--green);
+        text-decoration: none;
+        font-weight: 700;
+        border-bottom: 2px solid var(--green);
+      }
+      footer a:hover {
+        opacity: 0.8;
+      }
+
+      /* ---------- RESPONSIVE ---------- */
+      @media (max-width: 900px) {
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .steps {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .results-grid {
+          grid-template-columns: 1fr;
+        }
+        .hero-inner {
+          padding: 40px 26px;
+        }
+      }
+      @media (max-width: 560px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+        .steps {
+          grid-template-columns: 1fr;
+        }
+        .hero-star {
+          width: 44px;
+          height: 44px;
+          top: 20px;
+          right: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- HERO -->
+      <header class="hero">
+        <div class="hero-inner">
+          <div class="star hero-star">
+            <svg viewBox="0 0 100 100" fill="currentColor">
+              <path
+                d="M50 0 L58 40 L100 50 L58 60 L50 100 L42 60 L0 50 L42 40 Z"
+              />
+            </svg>
+          </div>
+          <div class="eyebrow">
+            <span class="dot"></span> AI Agent · Live Results
+          </div>
+          <h1>Reconcile</h1>
+          <div class="tagline-pill">
+            Automated receipt-to-transaction matching, with a human in the loop
+            only when it matters.
+          </div>
+          <p class="lead">
+            Reconcile is an LLM-based agent that matches bank transactions to
+            receipts, asks a clarifying question only when something is
+            genuinely ambiguous, and remembers vendor aliases so it never asks
+            the same question twice.
+          </p>
+        </div>
+      </header>
+
+      <!-- STATS -->
+      <section id="stats">
+        <div class="section-title">
+          <span class="pill blue">Overview</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card c-blue">
+            <div class="num" id="stat-total">0</div>
+            <div class="label">Total Transactions</div>
+          </div>
+          <div class="stat-card c-cream">
+            <div class="num" id="stat-matched">0</div>
+            <div class="label">Matched</div>
+          </div>
+          <div class="stat-card c-dark">
+            <div class="num" id="stat-review">0</div>
+            <div class="label">Needs Review</div>
+          </div>
+          <div class="stat-card c-green">
+            <div class="num" id="stat-noreceipt">0</div>
+            <div class="label">No Receipt</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section id="how">
+        <div class="section-title">
+          <span class="pill dark">How it</span>
+          <span class="pill blue">works</span>
+        </div>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <h3>Ingest</h3>
+            <p>
+              Upload a bank CSV and a folder of receipts. The agent parses both
+              into structured records.
+            </p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <h3>Score candidates</h3>
+            <p>
+              Each transaction is scored against receipt candidates on amount,
+              date proximity, and vendor similarity.
+            </p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <h3>Decide or ask</h3>
+            <p>
+              High-confidence matches are applied automatically. Genuinely
+              ambiguous cases get a single, specific clarifying question.
+            </p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <h3>Remember</h3>
+            <p>
+              Vendor aliases are saved from past answers, so the same question
+              never gets asked twice.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTS -->
+      <section id="results">
+        <div class="section-title">
+          <span class="pill blue">Results</span>
+        </div>
+        <div class="filters" id="filters">
+          <button class="filter-btn active" data-filter="all">
+            All <span class="count" id="count-all"></span>
+          </button>
+          <button class="filter-btn" data-filter="matched">
+            Matched <span class="count" id="count-matched"></span>
+          </button>
+          <button class="filter-btn" data-filter="needs_clarification">
+            Needs Review
+            <span class="count" id="count-needs_clarification"></span>
+          </button>
+          <button class="filter-btn" data-filter="no_match">
+            No Receipt <span class="count" id="count-no_match"></span>
+          </button>
+        </div>
+        <div class="results-grid" id="results-grid"></div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer>
+        <div class="footer-pill">
+          Built with Claude (Anthropic) + Gemini API ·
+          <a
+            href="https://github.com/your-username/reconcile"
+            target="_blank"
+            rel="noopener"
+            >View source on GitHub</a
+          >
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // ---- REPLACE THIS ARRAY WITH YOUR REAL DATA ----
+      const transactionData = [
+        {
+          transaction_desc: "SQ *BLUE BOTTLE COFFEE",
+          transaction_amount: 6.75,
+          transaction_date: "2026-06-02",
+          decision: "matched",
+          receipt_id: "rcpt_0231",
+          confidence: "high",
+          clarifying_question: null,
+          reasoning:
+            "Amount, date, and vendor name closely match receipt rcpt_0231 (Blue Bottle Coffee, $6.75, 2026-06-02).",
+        },
+        {
+          transaction_desc: "AMZN MKTP US*4T92J1",
+          transaction_amount: 142.3,
+          transaction_date: "2026-06-04",
+          decision: "needs_clarification",
+          receipt_id: null,
+          confidence: "medium",
+          clarifying_question:
+            "There are two Amazon receipts near this date and amount ($139.99 office chair, $142.30 monitor stand) — which one does this charge belong to?",
+          reasoning:
+            "Two receipts fall within the matching window with similar amounts; vendor name alone can't disambiguate Amazon orders.",
+        },
+        {
+          transaction_desc: "UBER TRIP HELP.UBER.COM",
+          transaction_amount: 18.42,
+          transaction_date: "2026-06-05",
+          decision: "no_match",
+          receipt_id: null,
+          confidence: "low",
+          clarifying_question: null,
+          reasoning:
+            "No receipt found within the 5-day matching window for this amount or vendor.",
+        },
+        {
+          transaction_desc: "GITHUB, INC.",
+          transaction_amount: 21.0,
+          transaction_date: "2026-06-01",
+          decision: "matched",
+          receipt_id: "rcpt_0198",
+          confidence: "high",
+          clarifying_question: null,
+          reasoning:
+            "Recurring subscription previously aliased as 'GitHub Team plan' — auto-matched without asking, using saved vendor alias.",
+        },
+        {
+          transaction_desc: "WEWORK 149 NEW MONTGOMERY",
+          transaction_amount: 450.0,
+          transaction_date: "2026-06-03",
+          decision: "needs_clarification",
+          receipt_id: null,
+          confidence: "medium",
+          clarifying_question:
+            "Is this the monthly desk fee or the day-pass receipt from 2026-05-30? Amounts are close but not identical.",
+          reasoning:
+            "Closest receipt is $445.00, a $5.00 gap outside the auto-match threshold — flagged instead of guessing.",
+        },
+        {
+          transaction_desc: "TST* THE FRANKLIN CAFE",
+          transaction_amount: 34.1,
+          transaction_date: "2026-06-06",
+          decision: "no_match",
+          receipt_id: null,
+          confidence: "low",
+          clarifying_question: null,
+          reasoning: "No receipt uploaded for this vendor or date range.",
+        },
+      ];
+      // -------------------------------------------------
+
+      const grid = document.getElementById("results-grid");
+      const filters = document.getElementById("filters");
+      let activeFilter = "all";
+
+      function fmtAmount(n) {
+        return "$" + Number(n).toFixed(2);
+      }
+      function fmtDate(d) {
+        const dt = new Date(d + "T00:00:00");
+        return dt.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+      }
+      function badgeLabel(decision) {
+        if (decision === "matched") return "Matched";
+        if (decision === "needs_clarification") return "Needs Review";
+        if (decision === "no_match") return "No Receipt";
+        return decision;
+      }
+
+      function render() {
+        const filtered =
+          activeFilter === "all"
+            ? transactionData
+            : transactionData.filter((t) => t.decision === activeFilter);
+
+        grid.innerHTML = "";
+
+        if (filtered.length === 0) {
+          grid.innerHTML =
+            '<div class="empty-state">No transactions in this category.</div>';
+          return;
+        }
+
+        filtered.forEach((t) => {
+          const card = document.createElement("div");
+          card.className = "result-card";
+
+          let clarifyHtml = "";
+          if (t.decision === "needs_clarification" && t.clarifying_question) {
+            clarifyHtml = `<div class="clarify-box"><strong>Clarifying question</strong>${t.clarifying_question}</div>`;
+          }
+
+          let receiptHtml = "";
+          if (t.receipt_id) {
+            receiptHtml = `<div class="receipt-line">Linked to ${t.receipt_id}</div>`;
+          }
+
+          card.innerHTML = `
+        <div class="result-top">
+          <div>
+            <div class="result-desc">${t.transaction_desc}</div>
+            <div class="result-meta">${fmtDate(t.transaction_date)}</div>
+          </div>
+          <div class="result-amount">${fmtAmount(t.transaction_amount)}</div>
+        </div>
+        <span class="badge ${t.decision}">${badgeLabel(t.decision)} <span class="confidence">${t.confidence}</span></span>
+        ${clarifyHtml}
+        <div class="reasoning">${t.reasoning}</div>
+        ${receiptHtml}
+      `;
+          grid.appendChild(card);
+        });
+      }
+
+      function updateCounts() {
+        const counts = {
+          all: transactionData.length,
+          matched: 0,
+          needs_clarification: 0,
+          no_match: 0,
+        };
+        transactionData.forEach((t) => {
+          if (counts[t.decision] !== undefined) counts[t.decision]++;
+        });
+        document.getElementById("count-all").textContent = counts.all;
+        document.getElementById("count-matched").textContent = counts.matched;
+        document.getElementById("count-needs_clarification").textContent =
+          counts.needs_clarification;
+        document.getElementById("count-no_match").textContent = counts.no_match;
+
+        document.getElementById("stat-total").textContent = counts.all;
+        document.getElementById("stat-matched").textContent = counts.matched;
+        document.getElementById("stat-review").textContent =
+          counts.needs_clarification;
+        document.getElementById("stat-noreceipt").textContent = counts.no_match;
+      }
+
+      filters.addEventListener("click", (e) => {
+        const btn = e.target.closest(".filter-btn");
+        if (!btn) return;
+        filters
+          .querySelectorAll(".filter-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeFilter = btn.dataset.filter;
+        render();
+      });
+
+      updateCounts();
+      render();
+    </script>
+  </body>
+</html>
+

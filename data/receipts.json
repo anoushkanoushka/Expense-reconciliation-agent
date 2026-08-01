@@ -1,0 +1,107 @@
+[
+  {
+    "id": "r1",
+    "vendor": "Joe's Diner",
+    "date": "2026-06-01",
+    "total_amount": 14.5
+  },
+  {
+    "id": "r2",
+    "vendor": "Starbucks",
+    "date": "2026-06-02",
+    "total_amount": 6.75
+  },
+  {
+    "id": "r3",
+    "vendor": "Amazon.com",
+    "date": "2026-06-03",
+    "total_amount": 42.99
+  },
+  { "id": "r4", "vendor": "Uber", "date": "2026-06-04", "total_amount": 18.3 },
+  {
+    "id": "r5",
+    "vendor": "The Coffee Shop",
+    "date": "2026-06-05",
+    "total_amount": 5.25
+  },
+  {
+    "id": "r6",
+    "vendor": "Starbucks",
+    "date": "2026-06-06",
+    "total_amount": 7.1
+  },
+  {
+    "id": "r7",
+    "vendor": "Netflix",
+    "date": "2026-06-09",
+    "total_amount": 15.49
+  },
+  {
+    "id": "r8",
+    "vendor": "Walmart Supercenter",
+    "date": "2026-06-11",
+    "total_amount": 63.42
+  },
+  { "id": "r9", "vendor": "Lyft", "date": "2026-06-12", "total_amount": 12.85 },
+  {
+    "id": "r10",
+    "vendor": "Amazon.com",
+    "date": "2026-06-13",
+    "total_amount": 29.99
+  },
+  {
+    "id": "r11",
+    "vendor": "Bagel Corner",
+    "date": "2026-06-15",
+    "total_amount": 9.4
+  },
+  {
+    "id": "r12",
+    "vendor": "Office Depot",
+    "date": "2026-06-16",
+    "total_amount": 54.1
+  },
+  {
+    "id": "r13",
+    "vendor": "Thai Garden Restaurant",
+    "date": "2026-06-16",
+    "total_amount": 19.5
+  },
+  {
+    "id": "r14",
+    "vendor": "Thai Grand Cafe",
+    "date": "2026-06-17",
+    "total_amount": 19.5
+  },
+  {
+    "id": "r15",
+    "vendor": "Delta Air Lines",
+    "date": "2026-06-19",
+    "total_amount": 412.0
+  },
+  {
+    "id": "r16",
+    "vendor": "Adobe Creative Cloud",
+    "date": "2026-06-22",
+    "total_amount": 54.99
+  },
+  {
+    "id": "r17",
+    "vendor": "GitHub",
+    "date": "2026-06-24",
+    "total_amount": 7.0
+  },
+  {
+    "id": "r18",
+    "vendor": "Chipotle Mexican Grill",
+    "date": "2026-06-26",
+    "total_amount": 13.2
+  },
+  { "id": "r19", "vendor": "Uber", "date": "2026-07-06", "total_amount": 24.6 },
+  {
+    "id": "r20",
+    "vendor": "Amazon.com",
+    "date": "2026-07-04",
+    "total_amount": 19.99
+  }
+]
