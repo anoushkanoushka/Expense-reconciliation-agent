@@ -25,14 +25,55 @@ Return ONLY JSON, no preamble, no markdown fences:
 
 
 def match_transaction(transaction: dict, candidates: list) -> dict:
+    original_vendor_raw = transaction.get("vendor_raw", "")
     transaction = apply_alias(transaction)
+
     prompt = MATCH_PROMPT.format(
         transaction=json.dumps(transaction), candidates=json.dumps(candidates)
     )
-    response = client.models.generate_content(model="gemini-flash-lite-latest", contents=prompt)
-    text = response.text.strip()
-    text = text.replace("```json", "").replace("```", "").strip()
-    return json.loads(text)
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-flash-lite-latest", contents=prompt
+        )
+        text = response.text.strip()
+        text = text.replace("```json", "").replace("```", "").strip()
+        result = json.loads(text)
+    except Exception as e:
+        # If the model call fails or returns something we can't parse,
+        # don't guess — flag it for a human rather than crashing the batch.
+        return {
+            "decision": "needs_clarification",
+            "receipt_id": None,
+            "confidence": "low",
+            "clarifying_question": (
+                "The matching model didn't return a usable response for this "
+                "transaction — can you check it manually?"
+            ),
+            "reasoning": (
+                f"Automated matching failed ({type(e).__name__}: {e}); "
+                "flagged for manual review instead of guessing."
+            ),
+        }
+
+    # Learn from confident matches: if this raw bank string hasn't been
+    # aliased yet, remember the real vendor name from the matched receipt.
+    # Recurring vendors (subscriptions, regular coffee runs, etc.) reuse the
+    # exact same raw descriptor every cycle, so this makes future matches
+    # for that vendor faster and more reliable without needing a human.
+    if (
+        result.get("decision") == "matched"
+        and result.get("confidence") == "high"
+        and original_vendor_raw
+        and original_vendor_raw not in load_aliases()
+    ):
+        matched_receipt = next(
+            (c for c in candidates if c.get("id") == result.get("receipt_id")), None
+        )
+        if matched_receipt and matched_receipt.get("vendor"):
+            save_alias(original_vendor_raw, matched_receipt["vendor"])
+
+    return result
 
 
 ALIASES_PATH = "aliases.json"
@@ -73,7 +114,18 @@ Flag for review if: category is ambiguous between personal/business use (meals, 
 
 
 def categorize_transaction(vendor: str, amount: float, date: str) -> dict:
+    # Not yet called from main.py / app.py — wired for a future tax-categorization pass.
     prompt = CATEGORIZE_PROMPT.format(vendor=vendor, amount=amount, date=date)
-    response = client.models.generate_content(model="gemini-flash-lite-latest", contents=prompt)
-    text = response.text.strip().replace("```json", "").replace("```", "").strip()
-    return json.loads(text)
+    try:
+        response = client.models.generate_content(
+            model="gemini-flash-lite-latest", contents=prompt
+        )
+        text = response.text.strip().replace("```json", "").replace("```", "").strip()
+        return json.loads(text)
+    except Exception as e:
+        return {
+            "category": "Uncategorized",
+            "deductible_pct": 0,
+            "flag_for_review": True,
+            "flag_reason": f"Categorization failed ({type(e).__name__}); needs manual review.",
+        }
